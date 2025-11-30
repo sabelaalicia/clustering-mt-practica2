@@ -1,0 +1,8 @@
+
+# Ignorar todo el contenido de la carpeta `data` por defecto
+/data/**
+
+# Excepciones: permitir versionar específicamente `data/raw/` y su contenido
+!/data/raw/
+!/data/raw/**
+
