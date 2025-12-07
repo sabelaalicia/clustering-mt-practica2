@@ -7,6 +7,7 @@ from nltk.stem import WordNetLemmatizer
 
 # Descargar recursos de NLTK
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
@@ -29,23 +30,14 @@ def quitar_cabecera(texto):
     return partes[1] if len(partes) > 1 else texto
 
 def quitar_firma(texto):
-    """Intentar eliminar la firma o pie de un mensaje.
-
-    Se siguen dos estrategias:
-
-    - Si existe un delimitador tradicional "--" en una línea
-      separada, se corta en esa posición.
-
-    - Si no, si existe un email en las últimas hasta 6 líneas se elimina
-      desde la línea donde aparece la dirección hasta el final.
-
+    """
     Args:
         texto (str): Texto completo del mensaje.
 
     Returns:
         str: Texto sin la firma detectada.
     """
-    7
+    
     # delimitador estándar
     if "\n--\n" in texto:
         return texto.split("\n--\n")[0]
@@ -77,12 +69,15 @@ def limpiar_texto(raw_text):
 def normalizar_texto(texto):
     """
     - Minúsculas
-    - Eliminar URLs, emails y caracteres no alfabéticos
+    - Eliminar URLs, emails y caracteres no alfabéticos y números
     """
     texto = texto.lower()
     texto = re.sub(r'http\S+|www\S+', '', texto)
     texto = re.sub(r'\b[\w\.-]+@[\w\.-]+\.\w+\b', '', texto)
+    texto = re.sub(r'In article <[^>]+>, [\w\.-]+@[\w\.-]+\.\w+ writes:', '', texto)
+    texto = re.sub(r'\d+', '', texto)
     texto = re.sub(r'[^a-z\s]', ' ', texto)
+    texto = re.sub(r'\s+', ' ', texto).strip()
     return texto
 
 def tokenizar_texto(texto):
@@ -108,10 +103,14 @@ def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_destino="../data/preproces
                     with open(fichero, "r", encoding="latin1") as f:
                         texto = f.read()
                     texto_limpio = limpiar_texto(texto)
- 
+                    texto_normalizado = normalizar_texto(texto_limpio)
+                    texto_tokens = tokenizar_texto(texto_normalizado)
+                    texto_lemmatizado = lematizar_tokens(texto_tokens)
+                    texto_final = " ".join(texto_lemmatizado)
+
                     ruta_destino.mkdir(parents=True, exist_ok=True)
-                    with open(ruta_destino / fichero.name, "w", encoding="utf-8") as f_out:
-                        f_out.write(texto_limpio)
+                    with open(ruta_destino / (fichero.name + ".txt"), "w", encoding="utf-8") as f_out:
+                        f_out.write(texto_final)
 
     print("Preprocesamiento completado")
 
