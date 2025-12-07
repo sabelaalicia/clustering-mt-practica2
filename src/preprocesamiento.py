@@ -96,10 +96,10 @@ def lematizar_tokens(tokens):
     return [lemmatizer.lemmatize(t) for t in tokens]
 
 
-def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_limpia="../data/preprocessed/"):
+def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_destino="../data/preprocessed/"):
     ruta_raw = Path(ruta_raw)
-    ruta_limpia = Path(ruta_limpia)
-    ruta_limpia.mkdir(parents=True, exist_ok=True)
+    ruta_destino = Path(ruta_destino)
+    ruta_destino.mkdir(parents=True, exist_ok=True)
 
     for carpeta in ruta_raw.iterdir():
         if carpeta.is_dir():
@@ -108,10 +108,9 @@ def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_limpia="../data/preprocess
                     with open(fichero, "r", encoding="latin1") as f:
                         texto = f.read()
                     texto_limpio = limpiar_texto(texto)
-
-                    out_carpeta = ruta_limpia / carpeta.name
-                    out_carpeta.mkdir(parents=True, exist_ok=True)
-                    with open(out_carpeta / fichero.name, "w", encoding="utf-8") as f_out:
+ 
+                    ruta_destino.mkdir(parents=True, exist_ok=True)
+                    with open(ruta_destino / fichero.name, "w", encoding="utf-8") as f_out:
                         f_out.write(texto_limpio)
 
     print("Preprocesamiento completado")
