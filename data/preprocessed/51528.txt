@@ -1,0 +1,1 @@
+one print non appletalk printer using dmm laserwriter stuff using serial driverand nothig vetried saving postscriptfile tried sending sendps say topen laserwriter driver appletalk messagethatprinter specified using imagewritwrite one cable use null modem adapter help lowell
