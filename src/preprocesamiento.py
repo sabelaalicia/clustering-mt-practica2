@@ -4,6 +4,7 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+import numpy as np
 
 # Descargar recursos de NLTK
 nltk.download('punkt')
@@ -91,11 +92,39 @@ def lematizar_tokens(tokens):
     return [lemmatizer.lemmatize(t) for t in tokens]
 
 
+
+def eliminar_outliers(ruta_preprocesada="../data/preprocessed/", percentil_inf=0.5, percentil_sup=99.5):
+    ruta_preprocesada = Path(ruta_preprocesada)
+    longitudes = []
+
+    # Primera pasada: obtener longitud de cada documento
+    for fichero in ruta_preprocesada.glob("*.txt"):
+        with open(fichero, "r", encoding="utf-8") as f:
+            tokens = f.read().split()
+            longitudes.append(len(tokens))
+
+    # Calcular percentiles
+    min_len = np.percentile(longitudes, percentil_inf)
+    max_len = np.percentile(longitudes, percentil_sup)
+    print(f"Eliminando documentos fuera del rango [{min_len}, {max_len}] palabras")
+
+    # Segunda pasada: eliminar documentos fuera del rango
+    eliminados = 0
+    for fichero in ruta_preprocesada.glob("*.txt"):
+        with open(fichero, "r", encoding="utf-8") as f:
+            tokens = f.read().split()
+        if len(tokens) < min_len or len(tokens) > max_len:
+            fichero.unlink()
+            eliminados += 1
+
+    print(f"Documentos eliminados: {eliminados}")
+
+
 def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_destino="../data/preprocessed/"):
     ruta_raw = Path(ruta_raw)
     ruta_destino = Path(ruta_destino)
     ruta_destino.mkdir(parents=True, exist_ok=True)
-
+    longitudes = []
     for carpeta in ruta_raw.iterdir():
         if carpeta.is_dir():
             for fichero in carpeta.iterdir():
@@ -108,10 +137,12 @@ def preprocesar_carpeta(ruta_raw="../data/raw/", ruta_destino="../data/preproces
                     texto_lemmatizado = lematizar_tokens(texto_tokens)
                     texto_final = " ".join(texto_lemmatizado)
 
+                    longitudes.append(len(texto_lemmatizado))
                     ruta_destino.mkdir(parents=True, exist_ok=True)
                     with open(ruta_destino / (fichero.name + ".txt"), "w", encoding="utf-8") as f_out:
                         f_out.write(texto_final)
-
+    
+    eliminar_outliers(ruta_destino)
     print("Preprocesamiento completado")
 
 
