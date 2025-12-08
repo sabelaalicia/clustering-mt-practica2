@@ -6,14 +6,9 @@ import os
 def plot_palabras_mas_frecuentes(X, vectorizer, vector_type="TF", top_n=10, guardar=True):
 
     freq = X.toarray().sum(axis=0)
-    # === MODIFICACIÓN CLAVE AQUÍ ===
-    # Define la cadena de 10 espacios
-    espacios = "          " # 10 espacios en blanco
-    
-    # Obtiene y modifica las palabras: añade 10 espacios antes y después de cada palabra.
+    espacios = "          "
     palabras_originales = vectorizer.get_feature_names_out()
     palabras = [f"{espacios}{p}{espacios}" for p in palabras_originales]
-    # ===============================
     df_freq = pd.DataFrame({'palabra': palabras, 'frecuencia': freq})
     df_freq = df_freq.sort_values('frecuencia', ascending=False).head(top_n)
     
@@ -32,12 +27,50 @@ def plot_palabras_mas_frecuentes(X, vectorizer, vector_type="TF", top_n=10, guar
     if guardar:
         path_guardar = os.path.join("docs", "images")
         os.makedirs(path_guardar, exist_ok=True)
-        # Cambiamos el nombre del archivo para reflejar que es la versión mejorada o simplemente sobrescribimos
         nombre_archivo = f"{vector_type}_top{top_n}_palabras.png" 
         ruta_completa = os.path.join(path_guardar, nombre_archivo)
         plt.savefig(ruta_completa, bbox_inches='tight')
-        print(f"Imagen guardada en {ruta_completa}")
     
     plt.show()
+    
+def plot_matrices_confusion(resultados_eval, carpeta_salida="results", guardar=True):
 
-# Nota: El nombre de la función se cambió a 'plot_palabras_mas_frecuentes_mejorado' para evitar confusiones.
+    os.makedirs(carpeta_salida, exist_ok=True)
+    ruta_img = os.path.join(carpeta_salida, "matrices_confusion.png")
+
+    metodos = list(resultados_eval.keys())
+    n = len(metodos)
+
+    # Definir figura 2x2 (sirve para 4 métodos)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    axes = axes.flatten()
+
+    for ax, metodo in zip(axes, metodos):
+        matriz = resultados_eval[metodo]["matriz_confusion"]
+
+        sns.heatmap(
+            matriz,
+            annot=False,
+            cmap="viridis",
+            ax=ax,
+            cbar=False
+        )
+        ax.set_title(f"Matriz de confusión - {metodo}")
+        ax.set_xlabel("Cluster asignado")
+        ax.set_ylabel("Cluster real")
+
+    # Ocultar ejes sobrantes si hay menos de 4 métodos
+    for i in range(len(metodos), 4):
+        fig.delaxes(axes[i])
+
+    plt.tight_layout()
+        
+    if guardar:
+        path_guardar = os.path.join("docs", "images")
+        os.makedirs(path_guardar, exist_ok=True)
+        nombre_archivo = "matrices_confusion.png" 
+        ruta_completa = os.path.join(path_guardar, nombre_archivo)
+        plt.savefig(ruta_completa, bbox_inches='tight')
+
+    plt.show()
+    
