@@ -1,54 +1,54 @@
 === RESULTADOS DE EVALUACIÓN ===
 
 --- Método: tf_kmeans ---
-Precisión (macro): 0.0110
-Cobertura (macro): 0.1429
-F1 (macro): 0.0204
+Precisión (macro): 0.0584
+Cobertura (macro): 0.1438
+F1 (macro): 0.0220
 Matriz de confusión:
-[[  0   2 122   0   0   0   0]
- [  0   0 144   0   0   0   0]
+[[  0   2 121   1   0   0   0]
+ [  0   1 143   0   0   0   0]
  [  0   0  59   0   0   0   0]
  [  0   0  47   0   0   2   0]
  [  2   0 208   0   0   0   0]
- [  0   0 135   1   0   0   4]
- [  0   0  51   0  18   0   0]]
+ [  0   0 139   0   0   0   1]
+ [  0   0  65   0   4   0   0]]
 
 --- Método: tf_agglomerative ---
-Precisión (macro): 0.1694
-Cobertura (macro): 0.1470
-F1 (macro): 0.0528
+Precisión (macro): 0.4556
+Cobertura (macro): 0.1518
+F1 (macro): 0.0627
 Matriz de confusión:
 [[  0 124   0   0   0   0   0]
  [  0 144   0   0   0   0   0]
  [  0  59   0   0   0   0   0]
- [  0  47   0   0   0   2   0]
+ [  1  46   0   2   0   0   0]
  [  0 210   0   0   0   0   0]
- [  6 131   2   0   1   0   0]
- [  0  60   3   4   0   0   2]]
+ [ 16 123   0   0   0   1   0]
+ [  6  56   2   0   4   0   1]]
 
 --- Método: tfidf_kmeans ---
-Precisión (macro): 0.1284
-Cobertura (macro): 0.1404
-F1 (macro): 0.1266
+Precisión (macro): 0.0592
+Cobertura (macro): 0.0627
+F1 (macro): 0.0563
 Matriz de confusión:
-[[ 3  0 21 41 42 17  0]
- [ 9  0 53 34 22 24  2]
- [12  0 11  8  4 20  4]
- [ 3  1  0  2  0  2 41]
- [58  0  7 39 27 71  8]
- [18 42  0 10  0 58 12]
- [ 4 41  0  3  0  8 13]]
+[[ 1  0  6 47 38 26  6]
+ [ 9  0 25 47 18 30 15]
+ [11  0 12  1  0 26  9]
+ [17  0  7  0  0  9 16]
+ [34  0 21 12  7 37 99]
+ [18 84  3  0  2 17 16]
+ [ 7 48  5  0  0  4  5]]
 
 --- Método: tfidf_agglomerative ---
-Precisión (macro): 0.2434
-Cobertura (macro): 0.1554
-F1 (macro): 0.0938
+Precisión (macro): 0.0406
+Cobertura (macro): 0.0916
+F1 (macro): 0.0408
 Matriz de confusión:
-[[110  14   0   0   0   0   0]
- [122  22   0   0   0   0   0]
+[[ 76   0   0   0  30   2  16]
+ [117   0   0   0   6   9  12]
  [ 59   0   0   0   0   0   0]
- [ 43   0   2   0   0   0   4]
- [188   7   1   0  10   4   0]
- [ 15   0 125   0   0   0   0]
- [  3   1  49  16   0   0   0]]
+ [ 45   4   0   0   0   0   0]
+ [195   0   0   9   6   0   0]
+ [ 18 120   0   0   2   0   0]
+ [  4  41  24   0   0   0   0]]
 

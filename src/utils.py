@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import numpy as np
+from sklearn.decomposition import PCA
 
 def plot_palabras_mas_frecuentes(X, vectorizer, vector_type="TF", top_n=10, guardar=True):
 
@@ -73,4 +75,40 @@ def plot_matrices_confusion(resultados_eval, carpeta_salida="results", guardar=T
         plt.savefig(ruta_completa, bbox_inches='tight')
 
     plt.show()
-    
+
+def plot_scatter_pca(matrices, labels_list, nombres=None, titles=None, guardar=True, carpeta_salida="docs/images"):
+
+    fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+    axes = axes.flatten()
+    cmap = plt.get_cmap("tab10")
+
+    for i in range(4):
+        X = matrices[i].toarray()
+        labels = np.asarray(labels_list[i])
+
+        pca = PCA(n_components=2, random_state=42)
+        coords = pca.fit_transform(X)
+        evr = pca.explained_variance_ratio_
+        evr1 = evr[0] * 100
+        evr2 = evr[1] * 100
+        evr_total = evr1 + evr2
+
+        ax = axes[i]
+        for j, lab in enumerate(np.unique(labels)):
+            ax.scatter(coords[labels == lab, 0], coords[labels == lab, 1], s=40, alpha=0.85,
+                       color=cmap(j % 10), label=f"Cluster {lab}")
+
+
+        ax.set_xlabel("PC1")
+        ax.set_ylabel("PC2")
+        title_base = titles[i] if titles else f"Scatter PCA - Plot {i+1}"
+        title_full = f"{title_base} (PC1 {evr1:.1f}%, PC2 {evr2:.1f}%, total {evr_total:.1f}%)"
+        ax.set_title(title_full)
+        ax.legend(title="Clusters", loc='best', fontsize='small')
+
+    plt.tight_layout(pad=3.0)
+    if guardar:
+        os.makedirs(carpeta_salida, exist_ok=True)
+        plt.savefig(os.path.join(carpeta_salida, "scatter_4plots.png"), bbox_inches='tight')
+
+    plt.show()

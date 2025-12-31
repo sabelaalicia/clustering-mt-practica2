@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
-import pandas as pd
 
 def filtrar_goldstandard(ruta_gold="data/goldstandard.csv", archivos_procesados=None):
     df_gold = pd.read_csv(ruta_gold)
@@ -30,6 +32,55 @@ def evaluar_un_metodo(y_true, y_pred):
     matriz = confusion_matrix(y_true, y_pred)
 
     return precision, recall, f1, matriz
+
+
+def plot_pca_tsne(matrix, labels, titulo="Visualización PCA + t-SNE", n_componentes_pca=50, n_componentes_tsne=2, random_state=42, guardar=True, guardar_ruta=None):
+    """
+    Aplica PCA seguido de t-SNE y visualiza los resultados.
+    
+    Args:
+        matrix: Matriz de representación (TF, TF-IDF, etc.) de forma (n_samples, n_features)
+        labels: Etiquetas de los documentos (gold standard, k-means, aglomerativo, etc.)
+        titulo: Título del gráfico
+        n_componentes_pca: Número de componentes para PCA (por defecto 50)
+        n_componentes_tsne: Número de componentes para t-SNE (por defecto 2)
+        random_state: Semilla aleatoria para reproducibilidad
+        guardar_ruta: Ruta donde guardar la imagen (ej: "results/pca_tsne.png"). Si es None, solo muestra.
+    
+    Returns:
+        coordenadas_tsne: Array con las coordenadas t-SNE
+        labels: Las etiquetas originales
+    """
+    print(f"Aplicando PCA a {n_componentes_pca} dimensiones...")
+    pca = PCA(n_components=n_componentes_pca, random_state=random_state)
+    matriz_pca = pca.fit_transform(matrix)
+    varianza_explicada = pca.explained_variance_ratio_.sum()
+    print(f"Varianza explicada por PCA: {varianza_explicada:.4f}")
+    
+    print(f"Aplicando t-SNE a {n_componentes_tsne} dimensiones...")
+    tsne = TSNE(n_components=n_componentes_tsne, random_state=random_state, perplexity=30, n_iter_without_progress=1000)
+    coordenadas_tsne = tsne.fit_transform(matriz_pca)
+    print("Reducción de dimensionalidad completada.")
+    
+    # Crear visualización
+    plt.figure(figsize=(10, 8))
+    scatter = plt.scatter(coordenadas_tsne[:, 0], coordenadas_tsne[:, 1], 
+                         c=labels, cmap='viridis', alpha=0.6, edgecolors='k', s=50)
+    
+    plt.colorbar(scatter, label='Etiquetas')
+    plt.title(titulo)
+    plt.xlabel('Componente t-SNE 1')
+    plt.ylabel('Componente t-SNE 2')
+    plt.grid(True, alpha=0.3)
+    
+    if guardar:
+        os.makedirs(os.path.dirname(guardar_ruta), exist_ok=True)
+        plt.savefig(guardar_ruta, dpi=300, bbox_inches='tight')
+        print(f"Gráfico guardado en: {guardar_ruta}")
+    
+    plt.show()
+    
+    return coordenadas_tsne, labels
 
 
 def run_evaluacion(resultados_dict, ruta_goldstandard="data/goldstandard.csv", carpeta_resultados="results", archivos_procesados=None):
@@ -71,5 +122,5 @@ def run_evaluacion(resultados_dict, ruta_goldstandard="data/goldstandard.csv", c
             f.write(np.array2string(matriz))
             f.write("\n\n")
 
-    print(f"[OK] Resultados de evaluación guardados en: {ruta_txt}")
+    print(f"Resultados de evaluación guardados en: {ruta_txt}")
     return resultados_eval
