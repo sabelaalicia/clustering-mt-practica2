@@ -9,7 +9,7 @@ def guardar_resultados_agrupamiento(resultados_dict, nombre_salida="resultados_a
     # Guardar cada array con su clave
     np.savez(ruta_archivo, **resultados_dict)
 
-    print(f"[OK] Diccionario de resultados guardado en: {ruta_archivo}")
+    print(f"Resultados guardados en: {ruta_archivo}")
 
 
 def run_metodo(X, metodo="kmeans", n_clusters=7):
