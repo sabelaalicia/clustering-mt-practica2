@@ -71,7 +71,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## 4. Ejecución
+## Ejecución
 
 Una vez activado el entorno virtual:
 
@@ -87,7 +87,7 @@ Este script ejecutará:
 5. Método Elbow para determinar número óptimo de clusters
 6. Clustering con k=9 y cálculo de métricas (precisión, recall, F1, matriz de confusión)
 
-## 5. Resultados
+## Resultados
 
 Los resultados se guardan automáticamente en:
 
