@@ -1,3 +1,4 @@
+import os
 from representacion import crear_textos, vectorizacion_TF, vectorizacion_TFIDF
 from utils import plot_palabras_mas_frecuentes, plot_matrices_confusion, plot_wordcloud
 from agrupamiento import run_agrupamiento, run_metodo
@@ -11,8 +12,8 @@ def main():
 
     ####  Vectorización  ####
 
-    #ruta = "C:\\Users\\sabel\\OneDrive\\Escritorio\\Master\\MT_conv2\\Practica 2\\clustering-mt-practica2\\data\\preprocessed"
-    ruta ="C:\\Users\\Sabela\\clustering-mt-practica2\\data\\preprocessed"
+    # Ruta relativa al archivo actual
+    ruta = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "preprocessed")
     
     
     textos, nombres_archivos = crear_textos(ruta)
