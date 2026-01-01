@@ -33,24 +33,13 @@ def evaluar_un_metodo(y_true, y_pred):
 
     return precision, recall, f1, matriz
 
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import os
 
 def plot_pca_tsne(matrix, labels, titulo="Visualización PCA + t-SNE", n_componentes_pca=50, n_componentes_tsne=2, random_state=42, guardar=True, guardar_ruta=None):
-    """
-    Aplica PCA seguido de t-SNE y visualiza los resultados.
-    
-    Args:
-        matrix: Matriz de representación (TF, TF-IDF, etc.) de forma (n_samples, n_features)
-        labels: Etiquetas de los documentos (gold standard, k-means, aglomerativo, etc.)
-        titulo: Título del gráfico
-        n_componentes_pca: Número de componentes para PCA (por defecto 50)
-        n_componentes_tsne: Número de componentes para t-SNE (por defecto 2)
-        random_state: Semilla aleatoria para reproducibilidad
-        guardar_ruta: Ruta donde guardar la imagen (ej: "results/pca_tsne.png"). Si es None, solo muestra.
-    
-    Returns:
-        coordenadas_tsne: Array con las coordenadas t-SNE
-        labels: Las etiquetas originales
-    """
     print(f"Aplicando PCA a {n_componentes_pca} dimensiones...")
     pca = PCA(n_components=n_componentes_pca, random_state=random_state)
     matriz_pca = pca.fit_transform(matrix)
@@ -62,22 +51,40 @@ def plot_pca_tsne(matrix, labels, titulo="Visualización PCA + t-SNE", n_compone
     coordenadas_tsne = tsne.fit_transform(matriz_pca)
     print("Reducción de dimensionalidad completada.")
     
+    # Usar colores discretos: asignar un color único a cada grupo (sin gradientes)
+    unique_labels = np.unique(labels)  # Obtener etiquetas únicas
+    colores_discretos = plt.cm.viridis(np.linspace(0, 1, len(unique_labels)))  # Usamos 'viridis' para colores discretos
+
+    # Crear un diccionario para mapear etiquetas a colores discretos
+    label_to_color = {label: colores_discretos[i] for i, label in enumerate(unique_labels)}
+    
     # Crear visualización
     plt.figure(figsize=(10, 8))
-    scatter = plt.scatter(coordenadas_tsne[:, 0], coordenadas_tsne[:, 1], 
-                         c=labels, cmap='viridis', alpha=0.6, edgecolors='k', s=50)
     
-    plt.colorbar(scatter, label='Etiquetas')
-    plt.title(titulo)
-    plt.xlabel('Componente t-SNE 1')
-    plt.ylabel('Componente t-SNE 2')
+    # Asignar un color a cada punto basado en su etiqueta
+    scatter = plt.scatter(coordenadas_tsne[:, 0], coordenadas_tsne[:, 1], 
+                         c=[label_to_color[label] for label in labels], alpha=0.6, edgecolors='k', s=50)
+    
+    # Crear una leyenda con colores discretos para cada etiqueta
+    handles = []
+    for label, color in label_to_color.items():
+        handles.append(plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=10, label=str(label)))
+    plt.legend(handles=handles, title="Grupos", loc='best')
+    
+    # Añadir etiquetas y título
+    plt.xlabel('Componente t-SNE 1', fontsize=12)
+    plt.ylabel('Componente t-SNE 2', fontsize=12)
+    plt.title(titulo, fontsize=14)
+    
     plt.grid(True, alpha=0.3)
     
+    # Guardar la imagen si se requiere
     if guardar:
         os.makedirs(os.path.dirname(guardar_ruta), exist_ok=True)
         plt.savefig(guardar_ruta, dpi=300, bbox_inches='tight')
         print(f"Gráfico guardado en: {guardar_ruta}")
     
+    # Mostrar el gráfico
     plt.show()
     
     return coordenadas_tsne, labels
