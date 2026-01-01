@@ -6,7 +6,6 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import numpy as np
 
-# Descargar recursos de NLTK
 nltk.download('punkt')
 nltk.download('punkt_tab')
 nltk.download('stopwords')
@@ -17,32 +16,14 @@ stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
 
 def quitar_cabecera(texto):
-    """Eliminar la cabecera de un mensaje de correo o texto.
 
-    Divide el texto en la primera doble línea en blanco
-     y devuelve la parte posterior. 
-    Args:
-        texto (str): Texto completo (posible email con cabecera).
-
-    Returns:
-        str: Texto sin la cabecera (o el original si no hay separación).
-    """
     partes = re.split(r'\n\s*\n', texto, maxsplit=1)
     return partes[1] if len(partes) > 1 else texto
 
 def quitar_firma(texto):
-    """
-    Args:
-        texto (str): Texto completo del mensaje.
 
-    Returns:
-        str: Texto sin la firma detectada.
-    """
-    
-    # delimitador estándar
     if "\n--\n" in texto:
         return texto.split("\n--\n")[0]
-
     
     # si hay email en últimas 6 líneas, corta desde ahí
     lines = texto.splitlines()
@@ -55,13 +36,7 @@ def quitar_firma(texto):
     return texto
 
 def limpiar_texto(raw_text):
-    """Limpieza de cabecera y firma de un texto.
-    Args:
-        raw_text (str): Texto original sin procesar.
 
-    Returns:
-        str: Texto limpio listo para análisis posterior.
-    """
     texto = quitar_cabecera(raw_text)
     texto = quitar_firma(texto)
     return texto
@@ -97,18 +72,15 @@ def eliminar_outliers(ruta_preprocesada="../data/preprocessed/", percentil_inf=0
     ruta_preprocesada = Path(ruta_preprocesada)
     longitudes = []
 
-    # Primera pasada: obtener longitud de cada documento
     for fichero in ruta_preprocesada.glob("*.txt"):
         with open(fichero, "r", encoding="utf-8") as f:
             tokens = f.read().split()
             longitudes.append(len(tokens))
 
-    # Calcular percentiles
     min_len = np.percentile(longitudes, percentil_inf)
     max_len = np.percentile(longitudes, percentil_sup)
     print(f"Eliminando documentos fuera del rango [{min_len}, {max_len}] palabras")
 
-    # Segunda pasada: eliminar documentos fuera del rango
     eliminados = 0
     for fichero in ruta_preprocesada.glob("*.txt"):
         with open(fichero, "r", encoding="utf-8") as f:
